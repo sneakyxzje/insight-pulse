@@ -7,9 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.insight_pulse.tech.auth.dtos.login.LoginRequest;
-import com.insight_pulse.tech.auth.dtos.register.RegisterRequest;
-import com.insight_pulse.tech.auth.dtos.register.RegisterResponse;
+import com.insight_pulse.tech.auth.dto.login.LoginRequest;
+import com.insight_pulse.tech.auth.dto.register.RegisterRequest;
+import com.insight_pulse.tech.auth.dto.register.RegisterResponse;
 import com.insight_pulse.tech.security.principal.UserDetailsImpl;
 import com.insight_pulse.tech.security.token.JwtTokenProvider;
 import com.insight_pulse.tech.user.domain.User;
@@ -40,7 +40,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setFullname(request.fullname());
         User saved = userRepository.save(user);
-        return new RegisterResponse (saved.getId());
+        return new RegisterResponse(saved.getId());
     }   
 
     public ResponseCookie login(LoginRequest request) {
@@ -55,6 +55,16 @@ public class AuthService {
         .secure(false) 
         .path("/")
         .maxAge(24 * 60 * 60)
+        .sameSite("Strict")
+        .build();
+    }
+
+    public ResponseCookie logout() {
+        return ResponseCookie.from("jwt")
+        .httpOnly(true)
+        .secure(false) 
+        .path("/")
+        .maxAge(0)
         .sameSite("Strict")
         .build();
     }
