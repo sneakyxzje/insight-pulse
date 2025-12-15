@@ -17,8 +17,8 @@
             return api.post('/auth/login', payload);
         },
         onSuccess: (data: any) => {
-            goto('/');
             queryClient.invalidateQueries({queryKey: ['me']})
+            goto('/');
         },
         onError: (error: any) => {
             console.error(error.response?.data?.message || 'Login failed. Please try again.');
@@ -71,7 +71,7 @@
                 />
             </div>
             
-            <Button type="submit" class="w-full mt-2">
+            <Button type="submit" class="w-full cursor-pointer mt-2">
                 Login
             </Button>
         </form>
