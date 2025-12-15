@@ -6,17 +6,17 @@
   import DropdownMenuSeparator from "@src/lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
   import DropdownMenuTrigger from "@src/lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
   import DropdownMenu from "@src/lib/components/ui/dropdown-menu/dropdown-menu.svelte";
-  import { useUser } from "@src/lib/queries/auth";
+  import { authKeys, useUser } from "@src/lib/queries/auth";
   import { api } from "@src/lib/utils/api";
   import { createMutation, useQueryClient } from "@tanstack/svelte-query";
 
-    const user = useUser();
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const user = useUser();
     const mutation = createMutation(() => ({
         mutationFn: async () => api.post('/auth/logout', {}),
         onSuccess: () => {
-            queryClient.setQueryData(['me'], null);
-            goto('/login')
+            queryClient.setQueryData(authKeys.user(), null);
+            goto('/')
         },
 
         onError: (error: any) => {
@@ -33,7 +33,7 @@
     <div class="container flex h-16 items-center max-w-7xl mx-auto justify-between px-4 sm:px-6 lg:px-8">
         
         <a href="/" class="text-2xl font-extrabold text-primary tracking-tight transition-colors hover:text-primary/80">
-            InsightPulse
+            CoreSense
         </a>
         
         {#if !user.data}
@@ -50,7 +50,7 @@
                     focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
                 "
             >
-                Get started
+                Bắt đầu ngay
             </a>
             </div>
         {:else}
