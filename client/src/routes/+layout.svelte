@@ -17,6 +17,6 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 <QueryClientProvider client={queryClient}>
-	{@render children()}
+    {@render children()}
   <SvelteQueryDevtools buttonPosition="bottom-right" />
 </QueryClientProvider>
