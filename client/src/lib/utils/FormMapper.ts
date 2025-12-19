@@ -1,12 +1,18 @@
 import type { FormQuestion } from "@src/lib/types/FormQuestion";
 
 export const getMappedAnswers = (
-  formSchema: FormQuestion[],
-  answer: Record<string, any>
+  answer: Record<string, any>,
+  formSchema?: FormQuestion[]
 ) => {
-  return formSchema.map((q) => ({
-    label: q.label,
-
-    value: answer[q.id] ?? "N/A",
+  if (!answer) return [];
+  if (formSchema && formSchema.length > 0) {
+    return formSchema.map((q) => ({
+      label: q.label,
+      value: answer[q.id] ?? "N/A",
+    }));
+  }
+  return Object.entries(answer).map(([key, value]) => ({
+    label: key,
+    value: value ?? "N/A",
   }));
 };
