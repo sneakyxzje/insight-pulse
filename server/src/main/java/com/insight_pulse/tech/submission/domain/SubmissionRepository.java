@@ -21,5 +21,15 @@ public interface SubmissionRepository extends JpaRepository<Submission, String> 
         @Param("userId") int userId
     );
 
+    @Query("""
+            SELECT s 
+            FROM Submission s WHERE s.campaign.id = :campaignId AND s.campaign.user.id = :userId AND s.id = :submissionId
+            """)
+    Submission findSubmissionDetail(
+        @Param("userId") int userId,
+        @Param("campaignId") String campaignId,
+        @Param("submissionId") String submissionId
+    );
+
     long countByCampaign_Id(String campaignId);
 }
