@@ -56,12 +56,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll() 
                         .requestMatchers(HttpMethod.POST, "/api/submission/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/submission/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/feedback/submit").permitAll()
 
                         .requestMatchers("/api/dashboard/**").authenticated()
                         .requestMatchers("/api/channel/**").authenticated()
                         .requestMatchers("/api/user/info").authenticated()
-
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
