@@ -1,6 +1,7 @@
 package com.insight_pulse.tech.campaign.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import com.insight_pulse.tech.campaign.dto.CampaignRequest;
 import com.insight_pulse.tech.campaign.dto.CampaignResponse;
 import com.insight_pulse.tech.campaign.dto.CampaignWithSubmissionsResponse;
 import com.insight_pulse.tech.campaign.service.CampaignService;
+import com.insight_pulse.tech.submission.dto.SubmissionDetailResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,5 +45,17 @@ public class CampaignController {
     @GetMapping("/{campaignId}/submissions")
     public ResponseEntity<CampaignWithSubmissionsResponse> getSubmissionsByCampaign(@PathVariable String campaignId) {
         return ResponseEntity.ok(campaignService.getSubmissionByCampaign(campaignId));
+    }
+
+    @GetMapping("/{campaignId}/submissions/{submissionId}")
+    public ResponseEntity<SubmissionDetailResponse> getSubmissionDetailByCampaign(@PathVariable String campaignId, @PathVariable String submissionId) {
+        return ResponseEntity.ok(campaignService.getSubmissionDetailByCampaign(campaignId, submissionId));
+    }
+    
+    @PostMapping("/{campaignId}/toggle-status")
+    public ResponseEntity<?> toggleCampaignStatus(@PathVariable String campaignId, @RequestBody Map<String, Boolean> body) {
+        boolean enabled = body.get("enabled");
+        campaignService.toggleCampaignStatus(campaignId, enabled);
+        return ResponseEntity.ok().build();
     }
 }
