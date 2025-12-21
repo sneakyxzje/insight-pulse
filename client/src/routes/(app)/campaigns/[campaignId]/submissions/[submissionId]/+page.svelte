@@ -9,9 +9,9 @@
     Calendar,
     BrainCircuit,
     MessageSquareQuote,
-    CheckCircle2,
-    Loader2,
-    AlertCircle,
+    CircleAlert,
+    Loader,
+    CircleCheck,
   } from "lucide-svelte";
   import { formatDateTime } from "$lib/utils/FormatDate";
   import { getMappedAnswers } from "$lib/utils/FormMapper";
@@ -97,7 +97,6 @@
                     class="text-xs font-bold text-muted-foreground uppercase tracking-wider"
                   >
                     {item.label}
-                    {item.value}
                   </p>
 
                   <div
@@ -136,7 +135,7 @@
 
               {#if errorMessage}
                 <p class="text-sm text-destructive flex items-center gap-2">
-                  <AlertCircle class="size-4" />
+                  <CircleAlert class="size-4" />
                   {errorMessage}
                 </p>
               {/if}
@@ -147,7 +146,7 @@
                 class="w-full sm:w-auto min-w-[200px]"
               >
                 {#if isAnalyzing}
-                  <Loader2 class="size-4 mr-2 animate-spin" />
+                  <Loader class="size-4 mr-2 animate-spin" />
                   Đang phân tích...
                 {:else}
                   <BrainCircuit class="size-4 mr-2" />
@@ -214,7 +213,7 @@
               {#if analysisResult.aiAssesment && analysisResult.highlights.length > 0}
                 <div class="space-y-3">
                   <p class="font-semibold text-sm flex items-center gap-2">
-                    <CheckCircle2 class="size-4 text-green-500" /> Điểm nổi bật
+                    <CircleCheck class="size-4 text-green-500" /> Đánh giá tổng quan
                   </p>
                   <ul
                     class="list-disc list-inside text-sm text-muted-foreground space-y-1"
