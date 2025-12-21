@@ -57,4 +57,6 @@ public class Campaign {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    private long totalSubmissions;
 }
