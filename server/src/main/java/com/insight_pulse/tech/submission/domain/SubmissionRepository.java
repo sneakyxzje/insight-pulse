@@ -31,5 +31,13 @@ public interface SubmissionRepository extends JpaRepository<Submission, String> 
         @Param("submissionId") String submissionId
     );
 
+    @Query(value = """
+    SELECT * 
+    FROM submissions s 
+    WHERE s.campaigns_id = :campaignId 
+      AND CAST(s.answers AS TEXT) ILIKE CONCAT('%', :search, '%')
+    """, nativeQuery = true)
+    List<Submission> searchSubmission(@Param("campaignId") String campaignId, @Param("search") String search);
+
     long countByCampaign_Id(String campaignId);
 }
