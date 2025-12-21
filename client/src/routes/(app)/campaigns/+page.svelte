@@ -7,21 +7,19 @@
   import { STATUS_COLORS, STATUS_LABELS } from "@src/lib/types/campaign";
   import Switch from "@src/lib/components/ui/switch/switch.svelte";
   import { api } from "@src/lib/utils/api";
-  import { navigating } from "$app/stores";
+  import { navigating } from "$app/state";
   import Skeleton from "@src/lib/components/ui/skeleton/skeleton.svelte";
+  import * as Pagination from "$lib/components/ui/pagination/index.js";
+  import { formatDate } from "@src/lib/utils/FormatDate.js";
   let { data } = $props();
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
+
   let campaigns = $state(data.campaigns);
+  let totalElements = $derived(data.totalElements);
   $effect(() => {
     campaigns = data.campaigns;
+    totalElements = data.totalElements;
   });
+
   let isToggleStatus = $state(false);
   let isLoading = $state(false);
   const handleCheckedChange = async (campaignId: string, newValue: boolean) => {
@@ -46,7 +44,7 @@
       isLoading = false;
     }
   };
-  const isLoadingScreen = $derived(!!$navigating);
+  const isLoadingScreen = $derived(navigating.to !== null);
 </script>
 
 <div class="space-y-6">
@@ -57,13 +55,13 @@
         Quản lý và theo dõi các chiến dịch khảo sát của bạn.
       </p>
     </div>
-    <Button class="cursor-pointer " onclick={() => goto("/campaigns/new")}>
+    <Button class="cursor-pointer" onclick={() => goto("/campaigns/new")}>
       <Plus class="mr-2 h-4 w-4" />
       Tạo chiến dịch
     </Button>
   </div>
 
-  {#if isLoadingScreen}
+  {#if campaigns.length === 0 && isLoadingScreen}
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {#each Array(3) as _}
         <div class="flex flex-col space-y-3">
@@ -75,7 +73,7 @@
         </div>
       {/each}
     </div>
-  {:else if campaigns.length === 0}
+  {:else if campaigns.length === 0 && !isLoadingScreen}
     <div
       class="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed text-center animate-in fade-in-50"
     >
@@ -89,60 +87,97 @@
         Bạn chưa tạo chiến dịch nào. Hãy bắt đầu thu thập dữ liệu ngay hôm nay.
       </p>
       <Button onclick={() => goto("/dashboard/campaigns/new")}>
-        <Plus class="mr-2 h-4 w-4" />
-        Tạo cái đầu tiên
+        <Plus class="mr-2 h-4 w-4" /> Tạo cái đầu tiên
       </Button>
     </div>
   {:else}
-    <div class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-      {#each campaigns as item (item.id)}
-        <Card.Root>
-          <Card.Header>
-            <div class="flex items-start justify-between">
-              <Badge
-                class="{STATUS_COLORS[item.status] ||
-                  'bg-primary'} text-white cursor-pointer border-0"
+    <div class="relative">
+      <div
+        class="grid gap-2 md:grid-cols-2 lg:grid-cols-3 transition-all duration-300
+        {isLoadingScreen
+          ? 'opacity-40 grayscale-[0.3] pointer-events-none'
+          : 'opacity-100'}"
+      >
+        {#each campaigns as item (item.id)}
+          <Card.Root class="group transition-shadow hover:shadow-md">
+            <Card.Header>
+              <div class="flex items-start justify-between">
+                <Badge
+                  class="{STATUS_COLORS[item.status] ||
+                    'bg-primary'} text-white border-0"
+                >
+                  {STATUS_LABELS[item.status] || item.status}
+                </Badge>
+                <Switch
+                  id="toggle-{item.id}"
+                  checked={item.status === "ACTIVE"}
+                  onCheckedChange={(e) => handleCheckedChange(item.id, e)}
+                  disabled={isLoading}
+                />
+              </div>
+              <Card.Title class="text-xl pt-2 truncate" title={item.name}>
+                {item.name}
+              </Card.Title>
+            </Card.Header>
+
+            <Card.Content class="flex-1 pb-4">
+              <p
+                class="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]"
               >
-                {STATUS_LABELS[item.status] || item.status}
-              </Badge>
-              <Switch
-                id="toggle-{item.id}"
-                checked={item.status === "ACTIVE"}
-                onCheckedChange={(e) => handleCheckedChange(item.id, e)}
-                disabled={isLoading}
-                class="cursor-pointer"
-              />
-            </div>
-            <Card.Title class="text-xl pt-2 " title={item.name}>
-              {item.name}
-            </Card.Title>
-          </Card.Header>
+                {item.description || "Không có mô tả"}
+              </p>
+              <div class="mt-4 flex items-center text-xs text-muted-foreground">
+                <Calendar class="mr-1 h-3 w-3" />
+                <span>Tạo ngày: {formatDate(item.createdAt)}</span>
+              </div>
+            </Card.Content>
 
-          <Card.Content class="flex-1 pb-4">
-            <p
-              class="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]"
-            >
-              {item.description || "Không có mô tả"}
-            </p>
+            <Card.Footer class="pt-0">
+              <Button
+                variant="outline"
+                class="w-full group-hover:border-primary cursor-pointer "
+                onclick={() => goto(`/campaigns/${item.id}`)}
+              >
+                Chi tiết <ArrowRight class="ml-2 h-4 w-4" />
+              </Button>
+            </Card.Footer>
+          </Card.Root>
+        {/each}
+      </div>
 
-            <div class="mt-4 flex items-center text-xs text-muted-foreground">
-              <Calendar class="mr-1 h-3 w-3" />
-              <span>Tạo ngày: {formatDate(item.createdAt)}</span>
-            </div>
-          </Card.Content>
-
-          <Card.Footer class="pt-0">
-            <Button
-              variant="outline"
-              class="w-full cursor-pointer group-hover:border-primary group-hover:text-primary transition-colors"
-              onclick={() => goto(`/campaigns/${item.id}`)}
-            >
-              Chi tiết
-              <ArrowRight class="ml-2 h-4 w-4" />
-            </Button>
-          </Card.Footer>
-        </Card.Root>
-      {/each}
+      <div class="mt-8">
+        {#if data.totalElements > data.size}
+          <Pagination.Root
+            count={totalElements}
+            perPage={data.size}
+            siblingCount={1}
+            page={data.currentPage + 1}
+            onPageChange={(p) =>
+              goto(`/campaigns?page=${p - 1}&size=${data.size}`)}
+          >
+            {#snippet children({ pages, currentPage })}
+              <Pagination.Content>
+                <Pagination.Item><Pagination.Previous /></Pagination.Item>
+                {#each pages as page (page.key)}
+                  {#if page.type === "ellipsis"}
+                    <Pagination.Item><Pagination.Ellipsis /></Pagination.Item>
+                  {:else}
+                    <Pagination.Item>
+                      <Pagination.Link
+                        {page}
+                        isActive={currentPage === page.value}
+                      >
+                        {page.value}
+                      </Pagination.Link>
+                    </Pagination.Item>
+                  {/if}
+                {/each}
+                <Pagination.Item><Pagination.Next /></Pagination.Item>
+              </Pagination.Content>
+            {/snippet}
+          </Pagination.Root>
+        {/if}
+      </div>
     </div>
   {/if}
 </div>
