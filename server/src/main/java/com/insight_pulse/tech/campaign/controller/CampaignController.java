@@ -22,6 +22,7 @@ import com.insight_pulse.tech.campaign.dto.UpdateCampaignRequest;
 import com.insight_pulse.tech.campaign.service.CampaignService;
 import com.insight_pulse.tech.submission.dto.SubmissionDetailResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -32,7 +33,7 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @PostMapping
-    public ResponseEntity<CampaignResponse> createCampaign(@RequestBody CampaignRequest request) {
+    public ResponseEntity<CampaignResponse> createCampaign(@Valid @RequestBody CampaignRequest request) {
         return ResponseEntity.ok(campaignService.createCampaign(request));
     }
 
