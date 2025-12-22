@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { FormQuestion } from "@src/lib/types/FormQuestion";
   import { api } from "@src/lib/utils/api.js";
   let { data } = $props();
   let answers = $state<Record<string, any>>({});
