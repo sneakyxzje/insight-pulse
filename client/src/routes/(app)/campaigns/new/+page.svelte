@@ -3,6 +3,7 @@
   import Button from "@src/lib/components/ui/button/button.svelte";
   import Input from "@src/lib/components/ui/input/input.svelte";
   import Label from "@src/lib/components/ui/label/label.svelte";
+
   import {
     BrainCircuit,
     Edit,
@@ -121,6 +122,7 @@
                 id="name"
                 class="border-border focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all rounded-xl h-11 bg-muted/30 focus:bg-background"
                 placeholder="VD: Khảo sát khách hàng 2024..."
+                autocomplete="off"
                 bind:value={formData.name}
               />
             </div>
