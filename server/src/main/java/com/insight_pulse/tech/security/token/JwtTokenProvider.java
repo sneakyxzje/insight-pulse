@@ -1,7 +1,13 @@
 package com.insight_pulse.tech.security.token;
 import java.util.Date;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import javax.crypto.SecretKey;
+
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
 import com.insight_pulse.tech.security.config.JwtConfigProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,10 +23,10 @@ import lombok.RequiredArgsConstructor;
 public class JwtTokenProvider {
     
     private final JwtConfigProperties jwtConfigProperties;
-
+    private final RedisTemplate<String, String> redisTemplate;
     private SecretKey secretKey;
 
-    private final long JWT_EXPIRATION = 86400000L;
+    private final long JWT_EXPIRATION = 600000L;
 
     @PostConstruct
     public void init() {
@@ -35,9 +41,25 @@ public class JwtTokenProvider {
     public String generateToken(int userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
-
         return Jwts.builder().setSubject(String.valueOf(userId)).claim("role", role).setIssuedAt(now).setExpiration(expiryDate).signWith(secretKey).compact();
     }
+    
+    public String generateRefreshToken() {
+        String refreshTokenId = UUID.randomUUID().toString();
+        return refreshTokenId;
+    }
+
+    public void storeToken(String userId, String refreshToken) {
+        redisTemplate.opsForValue().set(refreshToken, userId, 7, TimeUnit.DAYS); 
+    }
+    
+    public void deleteRefreshToken(String refreshToken) {
+        redisTemplate.delete(refreshToken);
+    }
+    
+    public String getUserIdFromRefreshToken(String refreshToken) {
+        return redisTemplate.opsForValue().get(refreshToken);
+    } 
 
     public String getEmailFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().getSubject();
@@ -55,6 +77,10 @@ public class JwtTokenProvider {
         .getBody();
 
         return claims.get("role", String.class);
+    }
+
+    public long getExpiryInSeconds() {
+        return JWT_EXPIRATION / 1000;
     }
 
     public boolean validateToken(String token) {
