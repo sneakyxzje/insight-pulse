@@ -21,6 +21,7 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.17",
 		"@tanstack/svelte-query-devtools": "^6.0.2",
+		"@types/cookie": "^0.6.0",
 		"@types/node": "^25.0.2",
 		"@types/uuid": "^10.0.0",
 		"bits-ui": "^2.14.4",
@@ -37,6 +38,7 @@
 	},
 	"dependencies": {
 		"@tanstack/svelte-query": "^6.0.10",
+		"cookie": "^1.1.1",
 		"lucide-svelte": "^0.561.0",
 		"mode-watcher": "^1.1.0",
 		"svelte-dnd-action": "^0.9.68",
