@@ -6,7 +6,7 @@
 
 <Sidebars.Provider>
   <Sidebar />
-  <main class="container mx-auto py-2">
+  <main class="w-full bg-sidebar">
     {@render children()}
   </main>
 </Sidebars.Provider>
