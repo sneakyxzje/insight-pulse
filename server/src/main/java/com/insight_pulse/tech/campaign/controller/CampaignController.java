@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +35,8 @@ public class CampaignController {
 
     @PostMapping
     public ResponseEntity<CampaignResponse> createCampaign(@Valid @RequestBody CampaignRequest request) {
-        return ResponseEntity.ok(campaignService.createCampaign(request));
+        CampaignResponse response = campaignService.createCampaign(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
