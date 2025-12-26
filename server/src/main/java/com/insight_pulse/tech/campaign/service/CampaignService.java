@@ -12,6 +12,8 @@ import com.insight_pulse.tech.campaign.dto.CampaignRequest;
 import com.insight_pulse.tech.campaign.dto.CampaignResponse;
 import com.insight_pulse.tech.campaign.dto.CampaignWithSubmissionsResponse;
 import com.insight_pulse.tech.campaign.dto.UpdateCampaignRequest;
+import com.insight_pulse.tech.campaign.mapper.CampaignMapper;
+import com.insight_pulse.tech.exception.ResourceNotFoundException;
 import com.insight_pulse.tech.security.context.CurrentUserProvider;
 import com.insight_pulse.tech.submission.domain.Submission;
 import com.insight_pulse.tech.submission.domain.SubmissionRepository;
@@ -32,26 +34,25 @@ public class CampaignService {
     private final UserRepository userRepository;
     private final SubmissionRepository submissionRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final CampaignMapper campaignMapper;
+
+    private Campaign getOwnedCampaign(String campaignId) {
+        int userId = currentUserProvider.getCurrentUserId();
+        return campaignRepository.findByIdAndUserId(campaignId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Campaign not found or access denied"));
+    }
 
     public CampaignResponse createCampaign(CampaignRequest request) {
         int userId = currentUserProvider.getCurrentUserId();
         User user = userRepository.getReferenceById(userId);
-        Campaign campaign = new Campaign();
-        campaign.setName(request.name());
-        campaign.setDescription(request.description());
-        campaign.setAiSystemPrompt(request.aiSystemPrompt());
-        campaign.setFormSchema(request.formSchema());
-        campaign.setUser(user);
-        Campaign saved = campaignRepository.save(campaign);
-        CampaignStatus status = saved.getStatus();
-
-        return new CampaignResponse(
-            saved.getId(),
-            saved.getName(),
-            saved.getDescription(),
-            status,
-            saved.getCreatedAt()
+        Campaign campaign = Campaign.create(
+            request.name(), 
+            request.description(), 
+            request.aiSystemPrompt(), 
+            request.formSchema(), 
+            user
         );
+        return campaignMapper.toResponse(campaignRepository.save(campaign));
     }
 
     public Page<CampaignResponse> getCampaigns(Pageable pageable) {
@@ -67,21 +68,8 @@ public class CampaignService {
     }
 
     public CampaignDetailResponse getCampaignById(String campaignId) {
-        int userId = currentUserProvider.getCurrentUserId();
-        Campaign campaign = campaignRepository.findByIdAndUserId(campaignId, userId)
-        .orElseThrow(() -> new RuntimeException("Campaign not found or permission denied"));
-        long totalSubmissions = submissionRepository.countByCampaign_Id(campaignId);
-        return new CampaignDetailResponse(
-            campaign.getId(),
-            campaign.getName(),
-            campaign.getDescription(),
-            campaign.getStatus(),
-            campaign.getFormSchema(),
-            campaign.getAiSystemPrompt(),
-            campaign.getCreatedAt(),
-            campaign.getUpdatedAt(),
-            totalSubmissions
-        );
+        Campaign campaign = getOwnedCampaign(campaignId);
+        return campaignMapper.toDetailResponse(campaign);
     }
 
     public CampaignWithSubmissionsResponse getSubmissionByCampaign(String campaignId) {
@@ -129,9 +117,8 @@ public class CampaignService {
         );
     }
 
-    public void toggleCampaignStatus(String campaignId, Boolean enabled) {
-        int userId = currentUserProvider.getCurrentUserId();
-        Campaign campaign = campaignRepository.findByIdAndUserId(campaignId, userId).orElseThrow(() -> new RuntimeException("Campaign not found or permission denied"));
+    public void toggleCampaignStatus(String campaignId, Boolean enabled) {        
+        Campaign campaign = getOwnedCampaign(campaignId);
         if(Boolean.TRUE.equals(enabled)) {
             campaign.setStatus(CampaignStatus.ACTIVE);
         } else {
@@ -142,28 +129,14 @@ public class CampaignService {
 
     @Transactional
     public CampaignDetailResponse updateCampaign(String campaignId, UpdateCampaignRequest request) {
-        int userId = currentUserProvider.getCurrentUserId();
-        Campaign campaign = campaignRepository.findByIdAndUserId(campaignId, userId)
-        .orElseThrow(() -> new RuntimeException("Campaign not found or permission denied"));
-
-        campaign.setName(request.name());
-        campaign.setDescription(request.description());
-        campaign.setFormSchema(request.formSchema());
-        campaign.setAiSystemPrompt(request.aiSystemPrompt());
-        campaignRepository.save(campaign);
-
-
-        return new CampaignDetailResponse(
-            campaign.getId(),
-            campaign.getName(),
-            campaign.getDescription(),
-            campaign.getStatus(),
-            campaign.getFormSchema(),
-            campaign.getAiSystemPrompt(),
-            campaign.getCreatedAt(),
-            campaign.getUpdatedAt(),
-            campaign.getTotalSubmissions()
+        Campaign campaign = getOwnedCampaign(campaignId);
+        campaign.update(
+            request.name(), 
+            request.description(), 
+            request.aiSystemPrompt(), 
+            request.formSchema()
         );
+        return campaignMapper.toDetailResponse(campaign);
     }
 
     public CampaignWithSubmissionsResponse findSubmissionByCampaign(String campaignId, String search) {
