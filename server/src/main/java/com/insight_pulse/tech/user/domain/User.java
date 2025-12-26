@@ -26,12 +26,15 @@ public class User {
     @Column(name="email", nullable = false, length = 100, unique = true)
     private String email;
 
-    @Column(name="password", nullable = false, length = 255)
+    @Column(name="password", nullable = true, length = 255)
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name="role", nullable = false, length = 20)
     private Role role = Role.USER;
+
+    @Column(name="google_id", unique=true)
+    private String googleId;
 
     @Column(name="created_at", updatable = false)
     private LocalDateTime createdAt;
