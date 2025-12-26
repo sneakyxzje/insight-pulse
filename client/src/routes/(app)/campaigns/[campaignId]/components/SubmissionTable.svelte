@@ -30,28 +30,36 @@
 </script>
 
 <div
-  class="flex-1 rounded-xl border bg-background shadow-sm overflow-hidden flex flex-col"
+  class="flex-1 rounded-lg border border-base-border-1 bg-base-3 shadow-sm overflow-hidden flex flex-col"
 >
   <div class="overflow-auto">
     <Table>
-      <TableHeader class="bg-muted sticky top-0 z-10 border-b shadow-sm">
-        <TableRow>
-          <TableHead class="w-[250px]">Người gửi</TableHead>
-          <TableHead class="w-[120px]">
-            <Button variant="ghost" size="sm" class="-ml-3 h-8 font-bold">
+      <TableHeader class="sticky top-0 z-10 border-b shadow-sm bg-base-3">
+        <TableRow class="border-base-border-1 hover:bg-transparent">
+          <TableHead class="w-[250px] align-top py-4">Người gửi</TableHead>
+          <TableHead class="w-[120px] align-top py-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="-ml-3 h-auto p-0 font-bold hover:bg-transparent"
+            >
               AI Score <ArrowUpDown class="ml-2 h-3 w-3" />
             </Button>
           </TableHead>
-          <TableHead class="min-w-[400px]">AI Tóm tắt & Nhận định</TableHead>
-          <TableHead class="w-[180px] text-right">Thời gian nộp</TableHead>
-          <TableHead class="w-[60px]"></TableHead>
-          <TableHead class="w-[60px] px-4"></TableHead>
+          <TableHead class="min-w-[400px] align-top py-4"
+            >AI Tóm tắt & Nhận định</TableHead
+          >
+          <TableHead class="w-[180px] text-right align-top py-4"
+            >Thời gian nộp</TableHead
+          >
+          <TableHead class="w-[60px] align-top py-4 text-center"></TableHead>
+          <TableHead class="w-[60px] align-top py-4 text-center"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {#each submissions as sub}
           <TableRow
-            class="hover:bg-muted/50 cursor-pointer transition-colors group"
+            class="hover:bg-base-hover cursor-pointer border-base-border-1 transition-colors group"
             onclick={() => openDetail(sub)}
           >
             <TableCell class="font-medium align-top py-4">
@@ -66,14 +74,16 @@
                 </code>
               </div>
             </TableCell>
+
             <TableCell class="align-top py-4">
               <Badge
                 variant="outline"
-                class={`font-bold px-2.5 py-0.5 text-xs ${getScoreColor(sub.score)}`}
+                class={`font-bold px-2.5 py-0.5 text-xs whitespace-nowrap ${getScoreColor(sub.score)}`}
               >
                 {sub.score ? sub.score + " / 10" : "N/A"}
               </Badge>
             </TableCell>
+
             <TableCell class="align-top py-4">
               <div class="flex flex-col gap-1.5 max-w-2xl">
                 <p
@@ -83,6 +93,7 @@
                 </p>
               </div>
             </TableCell>
+
             <TableCell
               class="text-right text-muted-foreground text-xs align-top py-4"
             >
@@ -100,24 +111,29 @@
             </TableCell>
 
             <TableCell class="align-top py-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                class="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"
-                onclick={(e) => e.stopPropagation()}
-              >
-                <Eye class="w-4 h-4" />
-              </Button>
+              <div class="flex justify-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors"
+                  onclick={(e) => e.stopPropagation()}
+                >
+                  <Eye class="w-4 h-4" />
+                </Button>
+              </div>
             </TableCell>
 
             <TableCell
               class="align-top py-4"
               onclick={(e) => e.stopPropagation()}
             >
-              <Checkbox
-                onCheckedChange={(checked) => checkComparison(checked, sub)}
-                checked={stateComparison.some((item) => item.id === sub.id)}
-              />
+              <div class="flex justify-center items-center h-8">
+                <Checkbox
+                  class="border-base-border-2 bg-base-2"
+                  onCheckedChange={(checked) => checkComparison(checked, sub)}
+                  checked={stateComparison.some((item) => item.id === sub.id)}
+                />
+              </div>
             </TableCell>
           </TableRow>
         {/each}
@@ -125,7 +141,7 @@
         {#if campaign.totalSubmissions === 0}
           <TableRow>
             <TableCell
-              colspan={5}
+              colspan={6}
               class="h-24 text-center text-muted-foreground"
             >
               Chưa có phản hồi nào được ghi nhận.
