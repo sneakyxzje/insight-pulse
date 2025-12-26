@@ -51,17 +51,20 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-3xl font-bold tracking-tight">Chiến dịch</h2>
-      <p class="text-muted-foreground mt-1">
+      <p class="text-base-fg-4 mt-1">
         Quản lý và theo dõi các chiến dịch khảo sát của bạn.
       </p>
     </div>
-    <Button class="cursor-pointer" onclick={() => goto("/campaigns/new")}>
+    <Button
+      class="cursor-pointer border bg-primary-1 text-primary-fg-1 hover:bg-primary-hover "
+      onclick={() => goto("/campaigns/new")}
+    >
       <Plus class="mr-2 h-4 w-4" />
       Tạo chiến dịch
     </Button>
   </div>
 
-  {#if campaigns.length === 0 && isLoadingScreen}
+  {#if isLoadingScreen}
     <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {#each Array(3) as _}
         <div class="flex flex-col space-y-3">
@@ -75,7 +78,7 @@
     </div>
   {:else if campaigns.length === 0 && !isLoadingScreen}
     <div
-      class="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed text-center animate-in fade-in-50"
+      class="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-base-border-1 text-center animate-in fade-in-50"
     >
       <div
         class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted"
@@ -86,7 +89,10 @@
       <p class="mb-4 mt-2 text-sm text-muted-foreground max-w-sm">
         Bạn chưa tạo chiến dịch nào. Hãy bắt đầu thu thập dữ liệu ngay hôm nay.
       </p>
-      <Button onclick={() => goto("/campaigns/new")}>
+      <Button
+        class="cursor-pointer bg-primary-1 text-primary-fg-1 hover:bg-primary-hover"
+        onclick={() => goto("/campaigns/new")}
+      >
         <Plus class="mr-2 h-4 w-4" /> Tạo chiến dịch đầu tiên
       </Button>
     </div>
@@ -99,7 +105,9 @@
           : 'opacity-100'}"
       >
         {#each campaigns as item (item.id)}
-          <Card.Root class="group transition-shadow hover:shadow-md">
+          <Card.Root
+            class="group transition-shadow border-base-border-3 hover:shadow-md"
+          >
             <Card.Header>
               <div class="flex items-start justify-between">
                 <Badge
@@ -132,10 +140,9 @@
               </div>
             </Card.Content>
 
-            <Card.Footer class="pt-0">
+            <Card.Footer>
               <Button
-                variant="outline"
-                class="w-full group-hover:border-primary cursor-pointer "
+                class="w-full bg-primary-1 text-primary-fg-1 hover:bg-primary-hover font-medium cursor-pointer"
                 onclick={() => goto(`/campaigns/${item.id}`)}
               >
                 Chi tiết <ArrowRight class="ml-2 h-4 w-4" />
