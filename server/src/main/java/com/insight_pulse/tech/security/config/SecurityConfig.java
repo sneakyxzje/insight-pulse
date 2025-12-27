@@ -61,7 +61,7 @@ public class SecurityConfig {
                                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                     response.getWriter().write("Token expired or Invalid");
                                 } else {
-                                    response.sendRedirect("oauth2/authorization/google");
+                                    response.sendRedirect("/oauth2/authorization/google");
                                 }
                             })
                         )
