@@ -1,5 +1,6 @@
 package com.insight_pulse.tech.campaign.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.insight_pulse.tech.campaign.dto.CampaignDetailResponse;
 import com.insight_pulse.tech.campaign.dto.CampaignRequest;
 import com.insight_pulse.tech.campaign.dto.CampaignResponse;
+import com.insight_pulse.tech.campaign.dto.CampaignStats;
 import com.insight_pulse.tech.campaign.dto.CampaignWithSubmissionsResponse;
 import com.insight_pulse.tech.campaign.dto.UpdateCampaignRequest;
 import com.insight_pulse.tech.campaign.service.CampaignService;
+import com.insight_pulse.tech.submission.dto.SubmissionChart;
 import com.insight_pulse.tech.submission.dto.SubmissionDetailResponse;
 
 import jakarta.validation.Valid;
@@ -42,6 +45,18 @@ public class CampaignController {
     @GetMapping
     public ResponseEntity<Page<CampaignResponse>> getCampaigns(Pageable pageable) {
         return ResponseEntity.ok(campaignService.getCampaigns(pageable));
+    }
+
+    @GetMapping("/campaign-info")
+    public ResponseEntity<CampaignStats> getCampaignsInfo() {
+        CampaignStats info = campaignService.getCampaignInfo();
+        return ResponseEntity.ok(info);
+    }
+
+    @GetMapping("/submission-chart")
+    public ResponseEntity<List<SubmissionChart>> getSubmissionChart() {
+        List<SubmissionChart> chartData = campaignService.getSubmissionChart();
+        return ResponseEntity.ok(chartData);
     }
 
     @GetMapping("/{campaignId}")
