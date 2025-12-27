@@ -4,6 +4,7 @@ package com.insight_pulse.tech.submission.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,6 +19,7 @@ import com.insight_pulse.tech.gemini.dto.GeminiResponse;
 import com.insight_pulse.tech.gemini.service.GeminiService;
 import com.insight_pulse.tech.submission.domain.Submission;
 import com.insight_pulse.tech.submission.domain.SubmissionRepository;
+import com.insight_pulse.tech.submission.dto.SubmissionEvent;
 import com.insight_pulse.tech.submission.dto.SubmissionRequest;
 import com.insight_pulse.tech.submission.dto.SubmissionResponse;
 
@@ -32,6 +34,7 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final GeminiService geminiService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public void submitForm(String campaignId, SubmissionRequest request) {
@@ -46,6 +49,16 @@ public class SubmissionService {
         submission.setSchemaSnapshot(schemaSnapshot);
         submissionRepository.save(submission);
         campaignRepository.incrementTotalSubmissions(campaignId);
+
+        SubmissionEvent event = new SubmissionEvent(
+            campaign.getName(),
+            submission.getId(),
+            "Một phản hồi mới đã được gửi đến chiến dịch " + campaign.getName(),
+            campaign.getTotalSubmissions(),
+            submission.getSubmittedAt()
+        );
+        messagingTemplate.convertAndSend("/topic/submissions", event);
+        System.out.println("New submission sent to /topic/submissions");
     }
 
     public PublicCampaignResponse getPublicSchema(String campaignId) {
