@@ -26,13 +26,23 @@
   <div>
     <Breadcrumb.Root>
       <Breadcrumb.List>
-        <Breadcrumb.Item>
-          <Breadcrumb.Link href="/dashboard">Dashboard</Breadcrumb.Link>
-        </Breadcrumb.Item>
-
         {@const paths = page.url.pathname
           .split("/")
-          .filter((t) => t !== "" && t !== page.params.submissionId)}
+          .filter(
+            (t) =>
+              t !== "" &&
+              t !== page.params.submissionId &&
+              t.toLowerCase() !== "dashboard"
+          )}
+        {#if paths.length === 0}
+          <Breadcrumb.Item>
+            <Breadcrumb.Page class="font-bold">Dashboard</Breadcrumb.Page>
+          </Breadcrumb.Item>
+        {:else}
+          <Breadcrumb.Item>
+            <Breadcrumb.Link href="/dashboard">Dashboard</Breadcrumb.Link>
+          </Breadcrumb.Item>
+        {/if}
 
         {#each paths as segment, index}
           {@const href = "/" + paths.slice(0, index + 1).join("/")}
@@ -75,7 +85,6 @@
       <MoonIcon
         class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100"
       />
-      <span class="sr-only">Toggle theme</span>
     </button>
   </div>
 </div>
