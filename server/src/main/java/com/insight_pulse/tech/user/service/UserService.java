@@ -13,7 +13,6 @@ public class UserService {
     
     private final UserRepository userRepository;
 
-
     public User processOAuthPostLogin(String email, String name, String googleId) {
         return userRepository.findByGoogleId(googleId).orElseGet(() -> {
             User newUser = new User();
