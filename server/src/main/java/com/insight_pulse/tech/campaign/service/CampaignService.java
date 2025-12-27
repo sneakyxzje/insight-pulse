@@ -10,6 +10,7 @@ import com.insight_pulse.tech.campaign.domain.CampaignStatus;
 import com.insight_pulse.tech.campaign.dto.CampaignDetailResponse;
 import com.insight_pulse.tech.campaign.dto.CampaignRequest;
 import com.insight_pulse.tech.campaign.dto.CampaignResponse;
+import com.insight_pulse.tech.campaign.dto.CampaignStats;
 import com.insight_pulse.tech.campaign.dto.CampaignWithSubmissionsResponse;
 import com.insight_pulse.tech.campaign.dto.UpdateCampaignRequest;
 import com.insight_pulse.tech.campaign.mapper.CampaignMapper;
@@ -17,6 +18,7 @@ import com.insight_pulse.tech.exception.ResourceNotFoundException;
 import com.insight_pulse.tech.security.context.CurrentUserProvider;
 import com.insight_pulse.tech.submission.domain.Submission;
 import com.insight_pulse.tech.submission.domain.SubmissionRepository;
+import com.insight_pulse.tech.submission.dto.SubmissionChart;
 import com.insight_pulse.tech.submission.dto.SubmissionDetailResponse;
 import com.insight_pulse.tech.submission.dto.SubmissionResponse;
 import com.insight_pulse.tech.user.domain.User;
@@ -53,6 +55,21 @@ public class CampaignService {
             user
         );
         return campaignMapper.toResponse(campaignRepository.save(campaign));
+    }
+
+    public CampaignStats getCampaignInfo() {
+        int userId = currentUserProvider.getCurrentUserId();
+        Double ratio = campaignRepository.calculateHightQualityRatio(userId);
+        return new CampaignStats(
+            campaignRepository.getSumSubmissionByUserId(userId),
+            campaignRepository.countByUserIdAndStatus(userId, CampaignStatus.ACTIVE),
+            ratio != null ? ratio : 0.0
+        );
+    }
+
+    public List<SubmissionChart> getSubmissionChart() {
+        int userId = currentUserProvider.getCurrentUserId();
+        return campaignRepository.getSubmissionChartData(userId);
     }
 
     public Page<CampaignResponse> getCampaigns(Pageable pageable) {
